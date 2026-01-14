@@ -1,0 +1,9 @@
+{
+  "status": "Success",
+  "item": {
+    "item_id": 1,
+    "name": "item_1",
+    "quantity": 25,
+    "price": 3
+  }
+}
