@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Search Items</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f9f7;
+      padding: 20px;
+    }
+    h1 {
+      color: #b06400;
+    }
+    input {
+      padding: 8px;
+      margin: 6px 0;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #0b7e69;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #c67a14;
+    }
+    pre {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      width: 90%;
+      min-height: 80px;
+      white-space: pre-wrap;
+      margin-top: 15px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Search</h1>
+
+  <h3>Search by Keyword</h3>
+  <input id="keyword" placeholder="Enter keyword (e.g., Mango)">
+  <button onclick="searchKeyword()">Search</button>
+
+  <h3>Search by ID</h3>
+  <input id="id" placeholder="Enter ID (e.g., 2)">
+  <button onclick="searchById()">Search</button>
+
+  <h3>Results</h3>
+  <pre id="output"></pre>
+
+  <div class="nav-buttons">
+    <button class="back-btn" onclick="window.location.href='client-home.html'">← Back to Client Dashboard</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Storefront</button>
+  </div>
+
+  <script>
+  const BASE_URL = "http://localhost:4001";
+
+  async function searchKeyword() {
+    const keyword = document.getElementById('keyword').value.trim();
+    const output = document.getElementById('output');
+
+    if (!keyword) {
+      output.textContent = "Please enter a keyword.";
+      return;
+    }
+
+    const res = await fetch(`${BASE_URL}/search?keyword=${encodeURIComponent(keyword)}`);
+    const data = await res.json();
+    output.textContent = JSON.stringify(data, null, 2);
+  }
+
+  async function searchById() {
+    const id = document.getElementById('id').value.trim();
+    const output = document.getElementById('output');
+
+    if (!id) {
+      output.textContent = "Please enter an ID.";
+      return;
+    }
+
+    const res = await fetch(`${BASE_URL}/search/${id}`);
+    const data = await res.json();
+    output.textContent = JSON.stringify(data, null, 2);
+  }
+</script>
+
+
+</body>
+</html>
