@@ -1,0 +1,266 @@
+/* Base layout */
+body {
+  font-family: Gill Sans, sans-serif;
+  background-color: rgba(43, 130, 114, 0.9);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-size: 1.5rem;
+}
+
+/* Storefront background */
+body.storefront {
+  background-image: url('images/tropical-fruits-image2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Headings */
+h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 3.5rem;
+  color: #ffffff;
+  text-align: center;
+  margin-top: 40px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+}
+
+h2 {
+  text-align: center;
+  color: #096253;
+}
+
+/* Main container */
+.container {
+  background-color: rgba(248, 251, 251, 0.95);
+  border-radius: 8px;
+  padding: 20px 30px;
+  width: 80%;
+  max-width: 900px;
+  margin: 60px auto 40px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+/* Buttons */
+button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+/* Navigation buttons */
+.back-btn {
+  background-color: #096253;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin: 10px;
+}
+
+.back-btn:hover {
+  background-color: #0b7e69;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+th, td {
+  padding: 10px 15px;
+  text-align: left;
+  border-bottom: 1px solid rgba(9, 98, 83, 0.25);
+}
+
+th {
+  background-color: #096253;
+  color: white;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: rgba(9, 98, 83, 0.05);
+}
+
+/* Forms */
+.form-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(9, 98, 83, 0.25);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #096253;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+/* Delete button */
+.delete-btn {
+  background-color: #dc3545;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Storefront fruit list */
+#fruit-list {
+  margin: 20px auto;
+  width: 100%;
+}
+
+.fruit {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin: 15px auto;
+  width: 80%;
+  max-width: 700px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* Fruit image */
+.fruit-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* Quantity controls */
+.quantity {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.quantity button {
+  background-color: #096253;
+}
+
+.quantity button:hover {
+  background-color: #074b3e;
+}
+
+/* Details button */
+.details-btn {
+  background-color: #007bff;
+}
+
+.details-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Fruit details page */
+.fruit-detail {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 25px;
+  width: 80%;
+  max-width: 600px;
+  margin: 40px auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+.fruit-detail img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 10px;
+  margin: 10px auto;
+}
+
+.fruit-detail p {
+  font-size: 2rem;
+  color: #333;
+}
+
+/* Cart page */
+body.cart-page {
+  background-color: #ffffff;
+}
+
+.cart-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  width: 80%;
+  max-width: 600px;
+  margin: 40px auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+#cart-items img {
+  width: 80px;
+  border-radius: 8px;
+}
+
+/* Top navigation */
+.top-nav {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.top-nav a {
+  background-color: #096253;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.top-nav a:hover {
+  background-color: #0b7e69;
+}
+
+/* Admin link */
+.admin-link {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.admin-link a {
+  color: #064a3f;
+  font-size: 1rem;
+  text-decoration: underline;
+}
