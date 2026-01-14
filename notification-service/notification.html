@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notifications</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f9f7;
+      padding: 20px;
+    }
+    h1 {
+      color: #096253;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 8px;
+      width: 300px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #096253;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0b7e69;
+    }
+    #output {
+      background: white;
+      padding: 12px;
+      border-radius: 6px;
+      width: 90%;
+      min-height: 80px;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Notification Manager</h1>
+
+  <h3>Add Notification</h3>
+  <input id="notifUser" placeholder="User name">
+  <input id="notifMessage" placeholder="Message">
+  <button onclick="sendNotification()">Add Notification</button>
+
+  <h3>Retrieve Notifications</h3>
+  <input id="viewUser" placeholder="User name">
+  <button onclick="viewNotifications()">View Notifications</button>
+
+  <h3>Response</h3>
+  <div id="output"></div>
+
+  <div class="nav-buttons">
+    <button class="back-btn" onclick="window.location.href='client-home.html'">← Back to Client Dashboard</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Storefront</button>
+  </div>
+
+  <script>
+    // MAIN SERVER, NOT microservice
+    const BASE_URL = "http://localhost:5010";
+
+    async function sendNotification() {
+      const user = document.getElementById("notifUser").value.trim();
+      const message = document.getElementById("notifMessage").value.trim();
+      const output = document.getElementById("output");
+
+      if (!user || !message) {
+        output.textContent = "Please enter both user and message.";
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/api/notify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user, message })
+      });
+
+      const data = await res.json();
+      output.textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function viewNotifications() {
+      const user = document.getElementById("viewUser").value.trim();
+      const output = document.getElementById("output");
+
+      if (!user) {
+        output.textContent = "Enter a user name.";
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/api/notifications/${user}`);
+      const data = await res.json();
+
+      if (!data || data.length === 0) {
+        output.textContent = "No notifications found.";
+        return;
+      }
+
+      output.innerHTML = data.map(n => `• ${n.message}`).join("<br>");
+    }
+  </script>
+
+</body>
+</html>

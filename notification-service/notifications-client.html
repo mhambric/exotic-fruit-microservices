@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Client Notifications</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      background: #f5f9f7;
+      font-family: Arial;
+      padding: 20px;
+    }
+
+    h1 {
+      font-family: "Pacifico", cursive;
+      color: #096253;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .box {
+      background: white;
+      border-radius: 10px;
+      border-left: 6px solid #096253;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto 20px auto;
+      box-shadow: 0 3px 7px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 16px;
+      background-color: #096253;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      background-color: #0b7e69;
+    }
+
+    .back-btn {
+      display: block;
+      width: 160px;
+      text-align: center;
+      background-color: #096253;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      margin: 30px auto;
+    }
+
+    .back-btn:hover {
+      background-color: #0b7e69;
+    }
+
+    .notif-item {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <h1>Notifications</h1>
+
+  <!--Add Notification -->
+  <div class="box">
+    <h3>Add Notification</h3>
+
+    <input id="notifUser" placeholder="Enter user name">
+    <input id="notifMessage" placeholder="Enter notification message">
+
+    <button onclick="sendNotification()">Send Notification</button>
+  </div>
+
+  <!-- View Notification -->
+  <div class="box">
+    <h3>View Notifications</h3>
+
+    <input id="viewUser" placeholder="Enter user name">
+
+    <button onclick="viewNotifications()">Load Messages</button>
+
+    <div id="notifList"></div>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="back-btn" onclick="window.location.href='client-home.html'">← Back to Client Dashboard</button>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Storefront</button>
+  </div>
+
+  <script>
+    const BASE_URL = "http://localhost:5010";
+
+    async function sendNotification() {
+      const user = document.getElementById("notifUser").value.trim();
+      const message = document.getElementById("notifMessage").value.trim();
+
+      if (!user || !message) {
+        alert("Please enter both user and message.");
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/api/notify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user, message })
+      });
+
+      const data = await res.json();
+
+      alert("Notification Sent!");
+    }
+
+    async function viewNotifications() {
+      const user = document.getElementById("viewUser").value.trim();
+      const container = document.getElementById("notifList");
+
+      if (!user) {
+        alert("Please enter a user name.");
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/api/notifications/${user}`);
+      const data = await res.json();
+
+      if (!data || data.length === 0) {
+        container.innerHTML = "<p>No notifications found.</p>";
+        return;
+      }
+
+      container.innerHTML = data
+        .map(n => `<div class="notif-item">• ${n.message}</div>`)
+        .join("");
+    }
+  </script>
+
+</body>
+</html>
