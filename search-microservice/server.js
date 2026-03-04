@@ -13,9 +13,8 @@ function loadItems() {
   return JSON.parse(data);
 }
 
-// --------------------------------------------
+
 // Search by keyword
-// --------------------------------------------
 app.get("/search", (req, res) => {
   const keyword = req.query.keyword ? req.query.keyword.toLowerCase() : "";
   if (!keyword) {
@@ -36,9 +35,8 @@ app.get("/search", (req, res) => {
   res.json(results);
 });
 
-// --------------------------------------------
+
 // Search by ID
-// --------------------------------------------
 app.get("/search/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const items = loadItems();
@@ -51,9 +49,8 @@ app.get("/search/:id", (req, res) => {
   res.json(match);
 });
 
-// --------------------------------------------
+
 // Run microservice
-// --------------------------------------------
 app.listen(4001, () => {
   console.log("Search microservice running on port 4001");
 });
