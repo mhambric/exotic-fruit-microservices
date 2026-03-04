@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <title>Inventory Manager</title>
+
   <style>
+    /* Page layout and default font */
     body {
       font-family: Arial, sans-serif;
       background-color: #f5f9f7;
       margin: 40px;
     }
+
+    /* Page heading */
     h1 {
       color: #096253;
     }
+
+    /* Shared button styling */
     button {
       background-color: #096253;
       color: white;
@@ -21,9 +27,13 @@
       cursor: pointer;
       margin-top: 10px;
     }
+
+    /* Button hover effect */
     button:hover {
       background-color: #0b7e69;
     }
+
+    /* Inventory table layout */
     table {
       width: 90%;
       border-collapse: collapse;
@@ -32,15 +42,21 @@
       border-radius: 8px;
       box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
     }
+
+    /* Table cell styles */
     th, td {
       border: 1px solid #ddd;
       text-align: left;
       padding: 10px;
     }
+
+    /* Table header styles */
     th {
       background-color: #096253;
       color: white;
     }
+
+    /* Form container styling */
     form {
       background: white;
       padding: 15px;
@@ -49,10 +65,14 @@
       width: 50%;
       margin-bottom: 20px;
     }
+
+    /* Makes labels appear on their own line */
     label {
       display: block;
       margin-top: 10px;
     }
+
+    /* Input field styling */
     input {
       padding: 8px;
       width: 95%;
@@ -60,198 +80,228 @@
       border-radius: 5px;
       margin-top: 5px;
     }
+
+    /* Error message styling */
     #error {
       color: red;
       margin-top: 10px;
     }
   </style>
 </head>
+
 <body>
+  <!-- Page title -->
   <h1>Inventory Manager</h1>
 
+  <!-- Form for adding or editing an inventory item -->
   <form id="addForm">
     <h3>Add or Edit Item</h3>
+
+    <!-- Item ID input -->
     <label>Item ID:</label>
     <input type="number" id="itemId" placeholder="Enter item ID" required>
+
+    <!-- Item name input -->
     <label>Name:</label>
     <input type="text" id="itemName" placeholder="Enter name" required>
+
+    <!-- Quantity input -->
     <label>Quantity:</label>
     <input type="number" id="itemQuantity" placeholder="Enter quantity" required>
+
+    <!-- Price input -->
     <label>Price ($):</label>
     <input type="number" step="0.01" id="itemPrice" placeholder="Enter price" required>
+
+    <!-- Buttons call JavaScript functions instead of submitting the form -->
     <button type="button" onclick="addItem()">Add Item</button>
     <button type="button" onclick="editItem()">Edit Item</button>
   </form>
 
+  <!-- Buttons for loading and clearing inventory -->
   <button onclick="loadInventory()">Load Inventory</button>
   <button onclick="clearInventory()" style="background-color:#b30000; margin-left:10px;">Clear Inventory</button>
 
+  <!-- Area for showing errors and status messages -->
   <div id="error"></div>
 
+  <!-- Navigation buttons back to other pages -->
   <div class="nav-buttons">
     <button class="back-btn" onclick="window.location.href='client-home.html'">← Back to Client Dashboard</button>
     <button class="back-btn" onclick="window.location.href='index.html'">← Back to Storefront</button>
   </div>
 
-
-
-
+  <!-- Table that displays inventory items -->
   <table id="inventoryTable" style="display: none;">
     <thead>
       <tr>
-        <th>ID</th><th>Name</th><th>Quantity</th><th>Price ($)</th>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Price ($)</th>
       </tr>
     </thead>
+
+    <!-- Table rows are inserted here by JavaScript -->
     <tbody></tbody>
   </table>
 
   <script>
-  const BASE_URL = "http://localhost:5010";
+    // Base URL for the main server routes
+    const BASE_URL = "http://localhost:5010";
 
-  // ------------------------
-  // LOAD INVENTORY
-  // ------------------------
-  async function loadInventory() {
-    const errorDiv = document.getElementById("error");
-    const table = document.getElementById("inventoryTable");
-    const tbody = table.querySelector("tbody");
+    // Loads all inventory items and displays them in the table
+    async function loadInventory() {
+      const errorDiv = document.getElementById("error");
+      const table = document.getElementById("inventoryTable");
+      const tbody = table.querySelector("tbody");
 
-    errorDiv.textContent = "";
-    tbody.innerHTML = "";
+      // Clear old messages and old table rows
+      errorDiv.textContent = "";
+      tbody.innerHTML = "";
 
-    try {
-      const res = await fetch(`${BASE_URL}/inventory`);
-      const data = await res.json();
+      try {
+        // Request inventory data from the server
+        const res = await fetch(`${BASE_URL}/inventory`);
+        const data = await res.json();
 
-      if (data.status !== "Success") {
-        errorDiv.textContent = data.message || "Unable to load inventory.";
+        // If the server returned an error, show it and hide the table
+        if (data.status !== "Success") {
+          errorDiv.textContent = data.message || "Unable to load inventory.";
+          table.style.display = "none";
+          return;
+        }
+
+        // Use an empty array if items is missing
+        const items = data.items || [];
+
+        // If there are no items, show a message and hide the table
+        if (items.length === 0) {
+          errorDiv.textContent = "No inventory items found.";
+          table.style.display = "none";
+          return;
+        }
+
+        // Add one row to the table for each item
+        items.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.item_id}</td>
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>${item.price}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        // Show the table once data is loaded
+        table.style.display = "table";
+      } catch (err) {
+        console.error("Error loading inventory:", err);
+        errorDiv.textContent = "Error loading inventory data.";
         table.style.display = "none";
+      }
+    }
+
+    // Sends a new item to the server and reloads the table
+    async function addItem() {
+      const id = parseInt(document.getElementById("itemId").value);
+      const name = document.getElementById("itemName").value.trim();
+      const quantity = parseInt(document.getElementById("itemQuantity").value);
+      const price = parseFloat(document.getElementById("itemPrice").value);
+      const errorDiv = document.getElementById("error");
+
+      // Basic form validation
+      if (!id || !name || !quantity || !price) {
+        errorDiv.textContent = "Please fill out all fields.";
         return;
       }
 
-      const items = data.items || [];
+      try {
+        // Send item data to the server
+        const res = await fetch(`${BASE_URL}/inventory/add`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ item_id: id, name, quantity, price })
+        });
 
-      if (items.length === 0) {
-        errorDiv.textContent = "No inventory items found.";
-        table.style.display = "none";
+        const data = await res.json();
+
+        // Show response and refresh inventory list
+        if (data.status === "Success") {
+          alert(data.message);
+          loadInventory();
+        } else {
+          errorDiv.textContent = data.message || "Failed to add item.";
+        }
+      } catch (err) {
+        console.error("Error adding item:", err);
+        errorDiv.textContent = "Error adding item.";
+      }
+    }
+
+    // Updates an existing item and reloads the table
+    async function editItem() {
+      const id = parseInt(document.getElementById("itemId").value);
+      const quantity = parseInt(document.getElementById("itemQuantity").value);
+      const price = parseFloat(document.getElementById("itemPrice").value);
+      const errorDiv = document.getElementById("error");
+
+      // Editing requires an ID plus the updated values
+      if (!id || !quantity || !price) {
+        errorDiv.textContent = "Please provide ID, quantity, and price.";
         return;
-       
       }
 
-      items.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.item_id}</td>
-          <td>${item.name}</td>
-          <td>${item.quantity}</td>
-          <td>${item.price}</td>
-        `;
-        tbody.appendChild(row);
-      });
+      try {
+        // Send update data to the server
+        const res = await fetch(`${BASE_URL}/inventory/edit`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ item_id: id, updates: { quantity, price } })
+        });
 
-      table.style.display = "table";
-    } catch (err) {
-      console.error("Error loading inventory:", err);
-      errorDiv.textContent = "Error loading inventory data.";
-      table.style.display = "none";
-    }
-  }
+        const data = await res.json();
 
-
-  // ------------------------
-  // ADD ITEM
-  // ------------------------
-  async function addItem() {
-    const id = parseInt(document.getElementById("itemId").value);
-    const name = document.getElementById("itemName").value.trim();
-    const quantity = parseInt(document.getElementById("itemQuantity").value);
-    const price = parseFloat(document.getElementById("itemPrice").value);
-    const errorDiv = document.getElementById("error");
-
-    if (!id || !name || !quantity || !price) {
-      errorDiv.textContent = "Please fill out all fields.";
-      return;
+        // Show response and refresh inventory list
+        if (data.status === "Success") {
+          alert(data.message);
+          loadInventory();
+        } else {
+          errorDiv.textContent = data.message || "Failed to update item.";
+        }
+      } catch (err) {
+        console.error("Error editing item:", err);
+        errorDiv.textContent = "Error updating item.";
+      }
     }
 
-    try {
-      const res = await fetch(`${BASE_URL}/inventory/add`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item_id: id, name, quantity, price })
-      });
+    // Deletes all inventory items after the user confirms
+    async function clearInventory() {
+      const errorDiv = document.getElementById("error");
 
-      const data = await res.json();
-
-      if (data.status === "Success") {
-        alert(data.message);
-        loadInventory();
-      } else {
-        errorDiv.textContent = data.message || "Failed to add item.";
+      // Stop if the user clicks cancel
+      if (!confirm("Are you sure you want to clear the entire inventory?")) {
+        return;
       }
 
-    } catch (err) {
-      console.error("Error adding item:", err);
-      errorDiv.textContent = "Error adding item.";
-    }
-  }
+      try {
+        // Request the server to clear all inventory items
+        const res = await fetch(`${BASE_URL}/inventory/clear`, { method: "DELETE" });
+        const data = await res.json();
 
-
-  // ------------------------
-  // EDIT ITEM
-  // ------------------------
-  async function editItem() {
-    const id = parseInt(document.getElementById("itemId").value);
-    const quantity = parseInt(document.getElementById("itemQuantity").value);
-    const price = parseFloat(document.getElementById("itemPrice").value);
-    const errorDiv = document.getElementById("error");
-
-    if (!id || !quantity || !price) {
-      errorDiv.textContent = "Please provide ID, quantity, and price.";
-      return;
-    }
-
-    try {
-      const res = await fetch(`${BASE_URL}/inventory/edit`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item_id: id, updates: { quantity, price } })
-      });
-
-      const data = await res.json();
-
-      if (data.status === "Success") {
-        alert(data.message);
-        loadInventory();
-      } else {
-        errorDiv.textContent = data.message || "Failed to update item.";
+        // Show response and refresh inventory list
+        if (data.status === "Success") {
+          alert("Inventory cleared successfully.");
+          loadInventory();
+        } else {
+          errorDiv.textContent = data.message || "Failed to clear inventory.";
+        }
+      } catch (err) {
+        console.error("Error clearing inventory:", err);
+        errorDiv.textContent = "Error clearing inventory.";
       }
-
-    } catch (err) {
-      console.error("Error editing item:", err);
-      errorDiv.textContent = "Error updating item.";
     }
-  }
-  async function clearInventory() {
-  const errorDiv = document.getElementById("error");
-
-  if (!confirm("Are you sure you want to clear the entire inventory?")) {
-    return;
-  }
-
-  try {
-    const res = await fetch(`${BASE_URL}/inventory/clear`, { method: "DELETE" });
-    const data = await res.json();
-
-    if (data.status === "Success") {
-      alert("Inventory cleared successfully.");
-      loadInventory(); // reload table
-    } else {
-      errorDiv.textContent = data.message || "Failed to clear inventory.";
-    }
-  } catch (err) {
-    console.error("Error clearing inventory:", err);
-    errorDiv.textContent = "Error clearing inventory.";
-  }
-}
-
-</script>
+  </script>
+</body>
+</html>
