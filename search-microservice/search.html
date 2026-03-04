@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <title>Search Items</title>
+
   <style>
+    /* Page layout and default font */
     body {
       font-family: Arial;
       background: #f5f9f7;
       padding: 20px;
     }
+
+    /* Page title color */
     h1 {
       color: #b06400;
     }
+
+    /* Input field styling */
     input {
       padding: 8px;
       margin: 6px 0;
@@ -19,6 +25,8 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
+
+    /* Button styling */
     button {
       padding: 8px 16px;
       background-color: #0b7e69;
@@ -27,9 +35,13 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
+    /* Button hover effect */
     button:hover {
       background-color: #c67a14;
     }
+
+    /* Output area styling for results */
     pre {
       background: white;
       padding: 12px;
@@ -44,57 +56,76 @@
 </head>
 
 <body>
-
+  <!-- Page title -->
   <h1>Search</h1>
 
+  <!-- Keyword search section -->
   <h3>Search by Keyword</h3>
   <input id="keyword" placeholder="Enter keyword (e.g., Mango)">
   <button onclick="searchKeyword()">Search</button>
 
+  <!-- ID search section -->
   <h3>Search by ID</h3>
   <input id="id" placeholder="Enter ID (e.g., 2)">
   <button onclick="searchById()">Search</button>
 
+  <!-- Results area -->
   <h3>Results</h3>
   <pre id="output"></pre>
 
+  <!-- Navigation buttons back to other pages -->
   <div class="nav-buttons">
     <button class="back-btn" onclick="window.location.href='client-home.html'">← Back to Client Dashboard</button>
     <button class="back-btn" onclick="window.location.href='index.html'">← Back to Storefront</button>
   </div>
 
   <script>
-  const BASE_URL = "http://localhost:4001";
+    // Base URL for the search microservice
+    const BASE_URL = "http://localhost:4001";
 
-  async function searchKeyword() {
-    const keyword = document.getElementById('keyword').value.trim();
-    const output = document.getElementById('output');
+    // Searches items by keyword and shows the response
+    async function searchKeyword() {
+      const keyword = document.getElementById("keyword").value.trim();
+      const output = document.getElementById("output");
 
-    if (!keyword) {
-      output.textContent = "Please enter a keyword.";
-      return;
+      // Make sure a keyword was entered
+      if (!keyword) {
+        output.textContent = "Please enter a keyword.";
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${BASE_URL}/search?keyword=${encodeURIComponent(keyword)}`
+        );
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        console.error("Error searching by keyword:", err);
+        output.textContent = "Error searching by keyword.";
+      }
     }
 
-    const res = await fetch(`${BASE_URL}/search?keyword=${encodeURIComponent(keyword)}`);
-    const data = await res.json();
-    output.textContent = JSON.stringify(data, null, 2);
-  }
+    // Searches items by ID and shows the response
+    async function searchById() {
+      const id = document.getElementById("id").value.trim();
+      const output = document.getElementById("output");
 
-  async function searchById() {
-    const id = document.getElementById('id').value.trim();
-    const output = document.getElementById('output');
+      // Make sure an ID was entered
+      if (!id) {
+        output.textContent = "Please enter an ID.";
+        return;
+      }
 
-    if (!id) {
-      output.textContent = "Please enter an ID.";
-      return;
+      try {
+        const res = await fetch(`${BASE_URL}/search/${id}`);
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        console.error("Error searching by ID:", err);
+        output.textContent = "Error searching by ID.";
+      }
     }
-
-    const res = await fetch(`${BASE_URL}/search/${id}`);
-    const data = await res.json();
-    output.textContent = JSON.stringify(data, null, 2);
-  }
-</script>
-
-
+  </script>
 </body>
 </html>
