@@ -1,17 +1,24 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Notifications</title>
+
   <style>
+    /* Page layout and default font */
     body {
       font-family: Arial;
       background: #f5f9f7;
       padding: 20px;
     }
+
+    /* Page heading color */
     h1 {
       color: #096253;
     }
+
+    /* Shared input and button styling */
     input, button {
       margin: 5px 0;
       padding: 8px;
@@ -19,14 +26,20 @@
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
+    /* Button styling */
     button {
       background-color: #096253;
       color: white;
       cursor: pointer;
     }
+
+    /* Button hover effect */
     button:hover {
       background-color: #0b7e69;
     }
+
+    /* Output area for server responses */
     #output {
       background: white;
       padding: 12px;
@@ -38,71 +51,96 @@
     }
   </style>
 </head>
-<body>
 
+<body>
+  <!-- Page title -->
   <h1>Notification Manager</h1>
 
+  <!-- Section for adding a new notification -->
   <h3>Add Notification</h3>
   <input id="notifUser" placeholder="User name">
   <input id="notifMessage" placeholder="Message">
   <button onclick="sendNotification()">Add Notification</button>
 
+  <!-- Section for retrieving notifications for a user -->
   <h3>Retrieve Notifications</h3>
   <input id="viewUser" placeholder="User name">
   <button onclick="viewNotifications()">View Notifications</button>
 
+  <!-- Area where results are displayed -->
   <h3>Response</h3>
   <div id="output"></div>
 
+  <!-- Navigation buttons back to other pages -->
   <div class="nav-buttons">
     <button class="back-btn" onclick="window.location.href='client-home.html'">← Back to Client Dashboard</button>
     <button class="back-btn" onclick="window.location.href='index.html'">← Back to Storefront</button>
   </div>
 
   <script>
-    // MAIN SERVER, NOT microservice
+    // Base URL for the main server routes
     const BASE_URL = "http://localhost:5010";
 
+    // Sends a notification to the server for the user
     async function sendNotification() {
       const user = document.getElementById("notifUser").value.trim();
       const message = document.getElementById("notifMessage").value.trim();
       const output = document.getElementById("output");
 
+      // Make sure both fields are filled out
       if (!user || !message) {
         output.textContent = "Please enter both user and message.";
         return;
       }
 
-      const res = await fetch(`${BASE_URL}/api/notify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user, message })
-      });
+      try {
+        // Send the notification request to the server
+        const res = await fetch(`${BASE_URL}/api/notify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user, message })
+        });
 
-      const data = await res.json();
-      output.textContent = JSON.stringify(data, null, 2);
+        const data = await res.json();
+
+        // Show the server response in the output area
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        console.error("Error sending notification:", err);
+        output.textContent = "Error sending notification.";
+      }
     }
 
+    // Requests notifications for a user and displays them on the page
     async function viewNotifications() {
       const user = document.getElementById("viewUser").value.trim();
       const output = document.getElementById("output");
 
+      // Make sure a user name was entered
       if (!user) {
         output.textContent = "Enter a user name.";
         return;
       }
 
-      const res = await fetch(`${BASE_URL}/api/notifications/${user}`);
-      const data = await res.json();
+      try {
+        // Request notifications for the user
+        const res = await fetch(`${BASE_URL}/api/notifications/${user}`);
+        const data = await res.json();
 
-      if (!data || data.length === 0) {
-        output.textContent = "No notifications found.";
-        return;
+        // If there are no notifications, show a message
+        if (!data || data.length === 0) {
+          output.textContent = "No notifications found.";
+          return;
+        }
+
+        // Show each notification message on its own line
+        output.innerHTML = data.map((n) => `${n.message}`).join("<br>");
+      } catch (err) {
+        console.error("Error loading notifications:", err);
+        output.textContent = "Error loading notifications.";
       }
-
-      output.innerHTML = data.map(n => `• ${n.message}`).join("<br>");
     }
   </script>
-
 </body>
 </html>
+```
