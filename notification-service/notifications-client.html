@@ -4,16 +4,21 @@
   <meta charset="UTF-8">
   <title>Client Notifications</title>
 
+  <!-- Google font used for the page title -->
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+  <!-- Shared stylesheet for the site -->
   <link rel="stylesheet" href="style.css">
 
   <style>
+    /* Page layout and default font */
     body {
       background: #f5f9f7;
       font-family: Arial;
       padding: 20px;
     }
 
+    /* Page title styling */
     h1 {
       font-family: "Pacifico", cursive;
       color: #096253;
@@ -21,6 +26,7 @@
       margin-bottom: 25px;
     }
 
+    /* Card container for each section */
     .box {
       background: white;
       border-radius: 10px;
@@ -31,6 +37,7 @@
       box-shadow: 0 3px 7px rgba(0,0,0,0.1);
     }
 
+    /* Input field styling */
     input {
       width: 100%;
       padding: 10px;
@@ -39,6 +46,7 @@
       border: 1px solid #ccc;
     }
 
+    /* Button styling */
     button {
       padding: 10px 16px;
       background-color: #096253;
@@ -49,10 +57,12 @@
       margin-top: 8px;
     }
 
+    /* Button hover effect */
     button:hover {
       background-color: #0b7e69;
     }
 
+    /* Back button styling */
     .back-btn {
       display: block;
       width: 160px;
@@ -65,93 +75,119 @@
       margin: 30px auto;
     }
 
+    /* Back button hover effect */
     .back-btn:hover {
       background-color: #0b7e69;
     }
 
+    /* Styling for each notification item */
     .notif-item {
       padding: 10px;
       border-bottom: 1px solid #ddd;
     }
-
   </style>
 </head>
 
 <body>
-
+  <!-- Page title -->
   <h1>Notifications</h1>
 
-  <!--Add Notification -->
+  <!-- Section for sending a notification -->
   <div class="box">
     <h3>Add Notification</h3>
 
+    <!-- Input for the user name -->
     <input id="notifUser" placeholder="Enter user name">
+
+    <!-- Input for the notification message -->
     <input id="notifMessage" placeholder="Enter notification message">
 
+    <!-- Button calls the sendNotification function -->
     <button onclick="sendNotification()">Send Notification</button>
   </div>
 
-  <!-- View Notification -->
+  <!-- Section for viewing notifications -->
   <div class="box">
     <h3>View Notifications</h3>
 
+    <!-- Input for the user name to look up -->
     <input id="viewUser" placeholder="Enter user name">
 
+    <!-- Button calls the viewNotifications function -->
     <button onclick="viewNotifications()">Load Messages</button>
 
+    <!-- Notifications are inserted here by JavaScript -->
     <div id="notifList"></div>
   </div>
 
+  <!-- Navigation buttons back to other pages -->
   <div class="nav-buttons">
     <button class="back-btn" onclick="window.location.href='client-home.html'">← Back to Client Dashboard</button>
     <button class="back-btn" onclick="window.location.href='index.html'">← Back to Storefront</button>
   </div>
 
   <script>
+    // Base URL for the main server routes
     const BASE_URL = "http://localhost:5010";
 
+    // Sends a notification to the server for the user
     async function sendNotification() {
       const user = document.getElementById("notifUser").value.trim();
       const message = document.getElementById("notifMessage").value.trim();
 
+      // Make sure both fields are filled out
       if (!user || !message) {
         alert("Please enter both user and message.");
         return;
       }
 
-      const res = await fetch(`${BASE_URL}/api/notify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user, message })
-      });
+      try {
+        // Send the notification request to the server
+        const res = await fetch(`${BASE_URL}/api/notify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user, message })
+        });
 
-      const data = await res.json();
-
-      alert("Notification Sent!");
+        await res.json();
+        alert("Notification sent.");
+      } catch (err) {
+        console.error("Error sending notification:", err);
+        alert("Error sending notification.");
+      }
     }
 
+    // Requests notifications for a user and displays them on the page
     async function viewNotifications() {
       const user = document.getElementById("viewUser").value.trim();
       const container = document.getElementById("notifList");
 
+      // Make sure a user name was entered
       if (!user) {
         alert("Please enter a user name.");
         return;
       }
 
-      const res = await fetch(`${BASE_URL}/api/notifications/${user}`);
-      const data = await res.json();
+      try {
+        // Request notifications for the user
+        const res = await fetch(`${BASE_URL}/api/notifications/${user}`);
+        const data = await res.json();
 
-      if (!data || data.length === 0) {
-        container.innerHTML = "<p>No notifications found.</p>";
-        return;
+        // If there are no notifications, show a message
+        if (!data || data.length === 0) {
+          container.innerHTML = "<p>No notifications found.</p>";
+          return;
+        }
+
+        // Add each notification message to the page
+        container.innerHTML = data
+          .map((n) => `<div class="notif-item">${n.message}</div>`)
+          .join("");
+      } catch (err) {
+        console.error("Error loading notifications:", err);
+        container.innerHTML = "<p>Error loading notifications.</p>";
       }
-
-      container.innerHTML = data
-        .map(n => `<div class="notif-item">• ${n.message}</div>`)
-        .join("");
     }
   </script>
-
 </body>
 </html>
