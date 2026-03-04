@@ -14,7 +14,7 @@ function sendRequest(request) {
   console.log("----------------------------------\n");
 }
 
-// ---  4 TEST CASES store, retrive, edit, retrives updated item ---
+// 4 TEST CASES store, retrive, edit, retrives updated item 
 
 // store item
 sendRequest({
